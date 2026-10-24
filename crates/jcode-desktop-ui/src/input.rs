@@ -947,6 +947,9 @@ impl PromptInput {
     }
 
     fn tab(&mut self, _: &Tab, window: &mut Window, cx: &mut Context<Self>) {
+        if !self.attachments.is_empty() {
+            return;
+        }
         let Some(on_tab) = &self.on_tab else {
             return;
         };

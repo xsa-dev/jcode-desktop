@@ -246,4 +246,7 @@ fn two_step_tab_and_pill_click_stage_then_submit_in_window(cx: &mut gpui::TestAp
     });
     let submitted = sent(&drain(&commands));
     assert_eq!(submitted, vec![expected_second]);
+
+    // 4) CJK display-cell truncation bounds wide glyphs by cell width rather than char count.
+    assert_eq!(truncate_pill_text("日本語テスト文字列", 10), "日本語テ…");
 }

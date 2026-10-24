@@ -76,16 +76,39 @@ impl SuggestedRepliesState {
     }
 }
 
-fn truncate_pill_text(text: &str, max_chars: usize) -> String {
+fn char_display_cells(ch: char) -> usize {
+    if ('\u{1100}'..='\u{115F}').contains(&ch)
+        || ('\u{2E80}'..='\u{A4CF}').contains(&ch)
+        || ('\u{AC00}'..='\u{D7A3}').contains(&ch)
+        || ('\u{F900}'..='\u{FAFF}').contains(&ch)
+        || ('\u{FE10}'..='\u{FE6F}').contains(&ch)
+        || ('\u{FF00}'..='\u{FF60}').contains(&ch)
+        || ('\u{FFE0}'..='\u{FFE6}').contains(&ch)
+        || ('\u{1F300}'..='\u{1FAFF}').contains(&ch)
+    {
+        2
+    } else {
+        1
+    }
+}
+
+fn truncate_pill_text(text: &str, max_cells: usize) -> String {
     let single_line = text.split_whitespace().collect::<Vec<_>>().join(" ");
-    let count = single_line.chars().count();
-    if count <= max_chars {
+    let total_cells: usize = single_line.chars().map(char_display_cells).sum();
+    if total_cells <= max_cells {
         return single_line;
     }
-    let kept: String = single_line
-        .chars()
-        .take(max_chars.saturating_sub(1))
-        .collect();
+    let budget = max_cells.saturating_sub(1);
+    let mut used = 0usize;
+    let mut kept = String::new();
+    for ch in single_line.chars() {
+        let w = char_display_cells(ch);
+        if used + w > budget {
+            break;
+        }
+        used += w;
+        kept.push(ch);
+    }
     format!("{kept}…")
 }
 

@@ -1892,6 +1892,8 @@ impl Panel {
                                 return;
                             }
                             panel.update(app, |this, cx| {
+                                this.suggested_replies.focused_index = None;
+                                this.suggested_replies.staged_text = None;
                                 if this.preview_state.is_some() {
                                     this.handle_preview_command(&content, cx);
                                     return;
